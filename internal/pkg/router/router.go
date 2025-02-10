@@ -21,27 +21,41 @@ func NewRouter(cfg *config.Config, service *project.Service) *Handler {
 		service: service,
 	}
 }
+
 func (h *Handler) InitRoutes() *gin.Engine {
 	api := gin.New()
+
+	api.Use(gin.Recovery())
+	api.Use(gin.Logger())
+	api.Use(cors.Default())
+
+	api.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
+	docs.SwaggerInfo.Title = "Projects Service API"
+	docs.SwaggerInfo.Description = "API Documentation"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "localhost:8787"
 	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.Schemes = []string{"http"}
+
+	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	router := api.Group("/api")
 	{
-		projects := router.Group("/project")
-		{
-			projects.POST("", h.CreateProject)
-			projects.GET("/:projectId", h.GetProject)
-			projects.DELETE("/:projectId", h.DeleteProject)
-			group := projects.Group("/group")
-			{
-				group.POST("", h.CreateGroup)
-				group.GET("/:groupId", h.GetGroup)
-				group.DELETE("/:groupId", h.DeleteGroup)
-			}
-		}
-
+		router.POST("/project", h.CreateProject)
+		router.GET("/project/:projectId", h.GetProject)
+		router.DELETE("/project/:projectId", h.DeleteProject)
+		// group := router.Group("/group")
+		// {
+		// 	group.POST("", h.CreateGroup)
+		// 	group.GET("/:groupId", h.GetGroup)
+		// 	group.DELETE("/:groupId", h.DeleteGroup)
+		// }
 	}
-	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	api.Use(cors.Default())
 
 	return api
 }

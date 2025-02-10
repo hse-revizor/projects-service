@@ -1,0 +1,117 @@
+basePath: /api
+definitions:
+  GetProjectDto:
+    properties:
+      id:
+        type: string
+      lastCheckDate:
+        type: string
+      name:
+        type: string
+      repositoryURL:
+        type: string
+    type: object
+  ProjectDto:
+    properties:
+      name:
+        type: string
+      repositoryURL:
+        type: string
+    required:
+    - name
+    - repositoryURL
+    type: object
+host: localhost:8787
+info:
+  contact: {}
+  description: This is the Projects Service API documentation
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Projects Service API
+  version: 1.0.0
+paths:
+  /project:
+    post:
+      consumes:
+      - application/json
+      description: Create a new project
+      parameters:
+      - description: Project input
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/ProjectDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/GetProjectDto'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create project
+      tags:
+      - Project
+  /project/{projectId}:
+    delete:
+      description: Delete a project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/GetProjectDto'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete project by id
+      tags:
+      - Project
+    get:
+      description: Get project details by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/GetProjectDto'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get project by id
+      tags:
+      - Project
+swagger: "2.0"

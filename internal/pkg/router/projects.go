@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -10,16 +11,19 @@ import (
 )
 
 // @Summary Create project
-// @Description In success case returns created project model.
+// @Description Create a new project
 // @Tags Project
 // @Accept json
-// @Param data body dto.CreateProjectDto true "Project input"
-// @Success 200 "" ""
-// @Router /projects [post]
+// @Produce json
+// @Param data body dto.ProjectDto true "Project input"
+// @Success 200 {object} dto.GetProjectDto
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /project [post]
 func (h *Handler) CreateProject(c *gin.Context) {
 	var req dto.ProjectDto
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		newErrorResponse(c, http.StatusBadRequest, err)
 		return
 	}
 	project, err := h.service.CreateProject(c, &project.CreateProject{
@@ -30,17 +34,26 @@ func (h *Handler) CreateProject(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err)
 		return
 	}
-	responseOK(c, project)
+	res := dto.GetProjectDto{
+		Id:            project.Id.String(),
+		Name:          project.Name,
+		LastCheckDate: "",
+		RepositoryURL: project.Sources[0],
+	}
+	responseOK(c, res)
 }
 
 // @Summary Get project by id
-// @Description In success case returns project model with provided id
+// @Description Get project details by its ID
 // @Tags Project
-// @Param id path string true "Project id input"
-// @Success 200 "" ""
-// @Router /project/{id} [get]
+// @Produce json
+// @Param projectId path string true "Project ID"
+// @Success 200 {object} dto.GetProjectDto
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /project/{projectId} [get]
 func (h *Handler) GetProject(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("projectId")
 	projectUUID, err := uuid.Parse(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err)
@@ -51,23 +64,30 @@ func (h *Handler) GetProject(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err)
 		return
 	}
-	res := dto.GetProjectDto{
-		Name:          project.Name,
-		LastCheckDate: "",
-		RepositoryURL: project.Sources[0],
-		FileName:      "",
+	lastCheckDate := ""
+	if project.LastCheckDate != nil {
+		lastCheckDate = project.LastCheckDate.Format(time.RFC3339)
 	}
-	responseOK(c, project)
+	res := dto.GetProjectDto{
+		Id:            project.Id.String(),
+		Name:          project.Name,
+		LastCheckDate: lastCheckDate,
+		RepositoryURL: project.Sources[0],
+	}
+	responseOK(c, res)
 }
 
 // @Summary Delete project by id
-// @Description In success case delete project model with provided id
+// @Description Delete a project by its ID
 // @Tags Project
-// @Param id path string true "Project id input"
-// @Success 200 "" ""
-// @Router /project/{id} [delete]
+// @Produce json
+// @Param projectId path string true "Project ID"
+// @Success 200 {object} dto.GetProjectDto
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /project/{projectId} [delete]
 func (h *Handler) DeleteProject(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("projectId")
 	projectUUID, err := uuid.Parse(id)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err)
@@ -78,5 +98,11 @@ func (h *Handler) DeleteProject(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err)
 		return
 	}
-	responseOK(c, project)
+	res := dto.GetProjectDto{
+		Id:            project.Id.String(),
+		Name:          project.Name,
+		LastCheckDate: "",
+		RepositoryURL: project.Sources[0],
+	}
+	responseOK(c, res)
 }

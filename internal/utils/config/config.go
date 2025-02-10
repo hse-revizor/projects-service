@@ -28,13 +28,13 @@ type Config struct {
 type DataBaseConfig struct {
 	Host     string
 	Port     uint16
-	Projectname string
 	Name     string
+	User     string
 	Password string
 	SSLMode  string
 }
 
-func LoadConfig(envMode, path string) (*Config, error) {
+func LoadConfig(envMode string) (*Config, error) {
 	mode, err := validateEnvMode(envMode)
 	if err != nil {
 		return nil, err
@@ -42,16 +42,29 @@ func LoadConfig(envMode, path string) (*Config, error) {
 
 	config := new(Config)
 
-	viper.SetConfigFile(path)
+	// Set environment variables
+	viper.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return nil, err
-	}
+	// Set default values
+	viper.SetDefault("PORT", 8787)
+	viper.SetDefault("HOST", "localhost")
+	viper.SetDefault("DB_HOST", "localhost")
+	viper.SetDefault("DB_PORT", 5432)
+	viper.SetDefault("DB_NAME", "postgres")
+	viper.SetDefault("DB_USER", "user")
+	viper.SetDefault("DB_PASSWORD", "password")
+	viper.SetDefault("DB_SSLMODE", "disable")
 
-	err = viper.Unmarshal(config)
-	if err != nil {
-		return nil, err
+	// Map environment variables to config structure
+	config.Port = uint16(viper.GetInt("PORT"))
+	config.Host = viper.GetString("HOST")
+	config.DB = DataBaseConfig{
+		Host:     viper.GetString("DB_HOST"),
+		Port:     uint16(viper.GetInt("DB_PORT")),
+		Name:     viper.GetString("DB_NAME"),
+		User:     viper.GetString("DB_USER"),
+		Password: viper.GetString("DB_PASSWORD"),
+		SSLMode:  viper.GetString("DB_SSLMODE"),
 	}
 
 	config.EnvMode = mode
@@ -59,8 +72,8 @@ func LoadConfig(envMode, path string) (*Config, error) {
 	return config, nil
 }
 
-func MustLoadConfig(envMode, path string) *Config {
-	config, err := LoadConfig(envMode, path)
+func MustLoadConfig(envMode string) *Config {
+	config, err := LoadConfig(envMode)
 	if err != nil {
 		panic(err)
 	}

@@ -30,7 +30,7 @@ func New(db *gorm.DB, getter *trmgorm.CtxGetter) *Storage {
 
 func buildDSN(cfg *config.Config) string {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s  dbname=%s sslmode=%s",
-		cfg.DB.Host, cfg.DB.Port, cfg.DB.Projectname, cfg.DB.Password, cfg.DB.Name, cfg.DB.SSLMode)
+		cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name, cfg.DB.SSLMode)
 
 	return dsn
 }

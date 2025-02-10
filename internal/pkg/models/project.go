@@ -12,23 +12,24 @@ import (
 )
 
 type Project struct {
-	Id           uuid.UUID    `gorm:"primaryKey;column:id"`
-	Name         string       `gorm:"column:name"`
-	Sources      Sources      `gorm:"column:sources"`
-	ProjectGroup ProjectGroup `gorm:"many2many:project_groups_projects"`
+	Id            uuid.UUID  `gorm:"primaryKey;column:id"`
+	Name          string     `gorm:"column:name"`
+	Sources       Sources    `gorm:"column:sources"`
+	LastCheckDate *time.Time `gorm:"column:last_check_date"`
+	// ProjectGroup ProjectGroup `gorm:"many2many:project_groups_projects"`
 
 	CreatedAt *time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt *time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
-type ProjectGroup struct {
-	Id          uuid.UUID `gorm:"primaryKey;column:id"`
-	Files       Sources   `gorm:"column:files"`
-	Projects    []Project `gorm:"many2many:project_groups_projects"`
-	WorkspaceID uuid.UUID `gorm:"column:workspace_id"`
-	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt   time.Time `gorm:"column:updated_at;autoUpdateTime"`
-}
+//	type ProjectGroup struct {
+//		Id          uuid.UUID `gorm:"primaryKey;column:id"`
+//		Files       Sources   `gorm:"column:files"`
+//		Projects    []Project `gorm:"many2many:project_groups_projects"`
+//		WorkspaceID uuid.UUID `gorm:"column:workspace_id"`
+//		CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
+//		UpdatedAt   time.Time `gorm:"column:updated_at;autoUpdateTime"`
+//	}
 type Sources []string
 
 func (b *Sources) Scan(value interface{}) error {

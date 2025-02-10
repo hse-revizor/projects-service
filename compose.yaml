@@ -1,16 +1,18 @@
 version: '3.8'
 services:
   projects:
-    image: revizor_projects_back:1.0
+    build: .
     ports:
-      - "8787:8787"
+      - "127.0.0.1:8787:8787"
     environment:
       - DB_HOST=db
       - DB_PORT=5432
       - DB_USER=user
       - DB_PASSWORD=password
       - DB_NAME=postgres
-      - SERVE_PORT=8787
+      - DB_SSLMODE=disable
+      - PORT=8787
+      - HOST=0.0.0.0
     networks:
       - projects_network
     depends_on:
@@ -21,12 +23,13 @@ services:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=postgres
+      - POSTGRES_SSLMODE=disable
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - projects_network
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
 
 volumes:
   postgres_data:

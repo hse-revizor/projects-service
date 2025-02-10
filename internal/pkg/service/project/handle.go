@@ -20,9 +20,9 @@ type CreateProject struct {
 // @throws: ErrProjectNotFound, ErrProjectExists
 func (s *Service) CreateProject(ctx context.Context, input *CreateProject) (*models.Project, error) {
 	created, err := s.storage.CreateProject(ctx, &models.Project{
-		Sources:      []string{input.RepositoryURL},
-		Name:         input.Name,
-		ProjectGroup: models.ProjectGroup{},
+		Sources:       []string{input.RepositoryURL},
+		Name:          input.Name,
+		LastCheckDate: nil,
 	})
 	if err != nil {
 		switch {
