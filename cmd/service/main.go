@@ -22,8 +22,7 @@ func main() {
 	cfg := config.MustLoadConfig(flags.EnvMode)
 	container := di.New(cfg)
 	gogger.ConfigureZeroLogger()
-
-	container.GetProjectService()
+	
 	log.Info(fmt.Sprintf("Server starting on %s:%d", cfg.Host, cfg.Port))
 
 	err := container.GetHttpServer().ListenAndServe()
